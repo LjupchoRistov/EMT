@@ -1,0 +1,8 @@
+{
+    "id": 3,
+    "name": "APARTMENT's 3",
+    "category": "APARTMENT",
+    "numRooms": 2,
+    "isBooked": true,
+    "host": 999
+}
