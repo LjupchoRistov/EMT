@@ -18,7 +18,6 @@ public class AccommodationDto {
     private String name;
     private Category category;
     private Integer numRooms;
-    private Boolean isBooked;
 
-    private Long host;
+    private Long hostId;
 }

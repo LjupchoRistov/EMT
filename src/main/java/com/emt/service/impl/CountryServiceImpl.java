@@ -1,6 +1,8 @@
 package com.emt.service.impl;
 
 import com.emt.model.Country;
+import com.emt.model.dto.CountryDto;
+import com.emt.model.exception.CountryAlreadyRegisteredException;
 import com.emt.model.exception.CountryNotFoundException;
 import com.emt.repository.CountryRepository;
 import com.emt.service.CountryService;
@@ -51,24 +53,27 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Optional<Country> create(Country country) {
-        this.countryRepository.save(country);
+    public Optional<Country> create(CountryDto countryDto) {
+        if (this.countryRepository.findByName(countryDto.getName()).isPresent())
+            throw new CountryAlreadyRegisteredException(countryDto.getName());
 
-        return Optional.of(country);
+        Country country = new Country(countryDto.getName(), countryDto.getContinent());
+
+        return Optional.of(this.countryRepository.save(country));
     }
 
     @Override
-    public Optional<Country> edit(Long id, Country oldVersion) {
+    public Optional<Country> edit(Long id, CountryDto countryDto) {
         if (id == null)
             throw new IllegalArgumentException();
 
-        Country newVersion = this.countryRepository.findById(id).orElseThrow(() -> new CountryNotFoundException(id));
+        Country country = this.countryRepository.findById(id).orElseThrow(() -> new CountryNotFoundException(id));
+        country.setName(countryDto.getName());
+        country.setContinent(countryDto.getContinent());
 
-        newVersion.setName(oldVersion.getName());
+        this.countryRepository.save(country);
 
-        this.countryRepository.save(newVersion);
-
-        return Optional.of(newVersion);
+        return Optional.of(country);
     }
 
     @Override

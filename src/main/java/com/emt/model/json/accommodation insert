@@ -1,8 +1,7 @@
 {
-    "id": 3,
-    "name": "APARTMENT's 3",
+    "id": null,
+    "name": "Ljupcho's APARTMENT no.1",
     "category": "APARTMENT",
     "numRooms": 2,
-    "isBooked": true,
-    "host": 999
+    "host": 1
 }

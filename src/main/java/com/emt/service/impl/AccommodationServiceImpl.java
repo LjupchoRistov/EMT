@@ -5,18 +5,17 @@ import com.emt.model.Host;
 import com.emt.model.dto.AccommodationDto;
 import com.emt.model.exception.AccommodationNotFoundException;
 import com.emt.model.exception.HostNotFoundException;
-import com.emt.model.mapper.AccommodationMapper;
+import com.emt.model.exception.NotEnoughRoomsAccommodationException;
 import com.emt.repository.AccommodationRepository;
 import com.emt.repository.HostRepository;
 import com.emt.service.AccommodationService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.emt.model.mapper.AccommodationMapper.*;
-import static com.emt.model.mapper.HostMapper.*;
 
 @Service
 public class AccommodationServiceImpl implements AccommodationService {
@@ -30,12 +29,12 @@ public class AccommodationServiceImpl implements AccommodationService {
     }
 
     @Override
-    public List<AccommodationDto> listAll() {
-        return this.accommodationRepository.findAll().stream().map(AccommodationMapper::accommodationDtoMapper).collect(Collectors.toList());
+    public List<Accommodation> listAll() {
+        return this.accommodationRepository.findAll();
     }
 
     @Override
-    public Optional<AccommodationDto> findById(Long id) {
+    public Optional<Accommodation> findById(Long id) {
         if (id == null)
             throw new IllegalArgumentException();
 
@@ -43,12 +42,11 @@ public class AccommodationServiceImpl implements AccommodationService {
         if (accommodation.isEmpty())
             throw new AccommodationNotFoundException(id);
 
-
-        return Optional.of(accommodationDtoMapper(accommodation.get()));
+        return accommodation;
     }
 
     @Override
-    public Optional<AccommodationDto> findByName(String name) {
+    public Optional<Accommodation> findByName(String name) {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException();
 
@@ -56,38 +54,33 @@ public class AccommodationServiceImpl implements AccommodationService {
         if (accommodation.isEmpty())
             throw new AccommodationNotFoundException(name);
 
-        return Optional.of(accommodationDtoMapper(accommodation.get()));
+        return accommodation;
     }
 
     @Override
-    public Optional<AccommodationDto> create(AccommodationDto accommodationDto) {
-        // Accommodation accommodation = accommodationMapper(accommodationDto);
-
-        Host host = this.hostRepository.findById(accommodationDto.getHost()).orElseThrow(() -> new HostNotFoundException(accommodationDto.getHost()));
+    public Optional<Accommodation> create(AccommodationDto accommodationDto) {
+        Host host = this.hostRepository.findById(accommodationDto.getHostId()).orElseThrow(() -> new HostNotFoundException(accommodationDto.getHostId()));
         Accommodation accommodation = new Accommodation(accommodationDto.getName(), accommodationDto.getNumRooms(), accommodationDto.getCategory(), host);
 
-        this.accommodationRepository.save(accommodation);
-
-        return Optional.of(accommodationDtoMapper(accommodation));
+        return Optional.of(this.accommodationRepository.save(accommodation));
     }
 
     @Override
-    public Optional<AccommodationDto> edit(Long id, AccommodationDto accommodationDto) {
+    public Optional<Accommodation> edit(Long id, AccommodationDto accommodationDto) {
         if (id == null)
             throw new IllegalArgumentException();
 
         Accommodation accommodation = this.accommodationRepository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
 
         accommodation.setName(accommodationDto.getName());
-        Host host = this.hostRepository.findById(accommodationDto.getHost()).orElseThrow(() -> new HostNotFoundException(accommodationDto.getHost()));
+        Host host = this.hostRepository.findById(accommodationDto.getHostId()).orElseThrow(() -> new HostNotFoundException(accommodationDto.getHostId()));
         accommodation.setHost(host);
         accommodation.setNumRooms(accommodationDto.getNumRooms());
         accommodation.setCategory(accommodationDto.getCategory());
-        accommodation.setIsBooked(accommodationDto.getIsBooked());
 
         this.accommodationRepository.save(accommodation);
 
-        return Optional.of(accommodationDtoMapper(accommodation));
+        return Optional.of(accommodation);
     }
 
     @Override
@@ -104,14 +97,20 @@ public class AccommodationServiceImpl implements AccommodationService {
     public boolean isBooked(Long id) {
         Accommodation accommodation = this.accommodationRepository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
 
-        return accommodation.getIsBooked();
+        return accommodation.getNumRooms() == 0;
     }
 
     @Override
     public void book(Long id) {
         Accommodation accommodation = this.accommodationRepository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
 
-        accommodation.setIsBooked(true);
+        int freeRooms = accommodation.getNumRooms();
+
+        if (freeRooms <= 0)
+            throw new NotEnoughRoomsAccommodationException(accommodation.getName(), id);
+
+        accommodation.setNumRooms(freeRooms - 1);
+
         this.accommodationRepository.save(accommodation);
     }
 
@@ -119,8 +118,8 @@ public class AccommodationServiceImpl implements AccommodationService {
     public void removeBook(Long id) {
         Accommodation accommodation = this.accommodationRepository.findById(id).orElseThrow(() -> new AccommodationNotFoundException(id));
 
-        accommodation.setIsBooked(false);
+        accommodation.setNumRooms(accommodation.getNumRooms() + 1);
+
         this.accommodationRepository.save(accommodation);
     }
-
 }

@@ -1,6 +1,7 @@
 package com.emt.web.rest;
 
 import com.emt.model.Country;
+import com.emt.model.dto.CountryDto;
 import com.emt.model.dto.HostDto;
 import com.emt.service.CountryService;
 import com.emt.service.HostService;
@@ -34,16 +35,16 @@ public class CountryRestController {
 
     // Add (WORKING)
     @PostMapping("/add")
-    public ResponseEntity<Country> create(@RequestBody Country country){
-        return this.countryService.create(country)
+    public ResponseEntity<Country> create(@RequestBody CountryDto countryDto){
+        return this.countryService.create(countryDto)
                 .map(a -> ResponseEntity.ok().body(a))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     // Edit (WORKING)
     @PostMapping("/{id}/edit")
-    public ResponseEntity<Country> edit(@PathVariable Long id, @RequestBody Country country){
-        return this.countryService.edit(id, country)
+    public ResponseEntity<Country> edit(@PathVariable Long id, @RequestBody CountryDto countryDto){
+        return this.countryService.edit(id, countryDto)
                 .map(a -> ResponseEntity.ok().body(a))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }

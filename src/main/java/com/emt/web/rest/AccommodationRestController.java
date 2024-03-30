@@ -20,13 +20,13 @@ public class AccommodationRestController {
 
     // List all (WORKING)
     @GetMapping
-    public List<AccommodationDto> findAll(){
+    public List<Accommodation> findAll(){
         return this.accommodationService.listAll();
     }
 
     // Find with id (WORKING)
     @GetMapping("/{id}")
-    public ResponseEntity<AccommodationDto> findById(@PathVariable Long id){
+    public ResponseEntity<Accommodation> findById(@PathVariable Long id){
         return this.accommodationService.findById(id)
                 .map(a -> ResponseEntity.ok().body(a))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
@@ -34,7 +34,7 @@ public class AccommodationRestController {
 
     // Add (WORKING)
     @PostMapping("/add")
-    public ResponseEntity<AccommodationDto> create(@RequestBody AccommodationDto accommodationDto){
+    public ResponseEntity<Accommodation> create(@RequestBody AccommodationDto accommodationDto){
         return this.accommodationService.create(accommodationDto)
                 .map(a -> ResponseEntity.ok().body(a))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
@@ -42,7 +42,7 @@ public class AccommodationRestController {
 
     // Edit (WORKING)
     @PostMapping("/{id}/edit")
-    public ResponseEntity<AccommodationDto> edit(@PathVariable Long id, @RequestBody AccommodationDto accommodationDto){
+    public ResponseEntity<Accommodation> edit(@PathVariable Long id, @RequestBody AccommodationDto accommodationDto){
         return this.accommodationService.edit(id, accommodationDto)
                 .map(a -> ResponseEntity.ok().body(a))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
@@ -51,10 +51,7 @@ public class AccommodationRestController {
     // Set accommodation as booked (WORKING)
     @PostMapping("/book/{id}")
     public ResponseEntity<AccommodationDto> book(@PathVariable Long id){
-        if (this.accommodationService.isBooked(id))
-            return ResponseEntity.badRequest().build();
-
-        this.accommodationService.book(id);
+         this.accommodationService.book(id);
 
         if (this.accommodationService.isBooked(id))
             return ResponseEntity.ok().build();

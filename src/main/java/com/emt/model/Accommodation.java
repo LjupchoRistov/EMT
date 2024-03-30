@@ -21,14 +21,12 @@ public class Accommodation {
     @Enumerated(value = EnumType.STRING)
     private Category category;
     private Integer numRooms;
-    private Boolean isBooked;
 
     public Accommodation(String name, Integer numRooms, Category category, Host host) {
         this.name = name;
         this.numRooms = numRooms;
         this.category = category;
         this.host = host;
-        this.isBooked = false;
     }
 
     // Relations

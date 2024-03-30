@@ -26,13 +26,12 @@ public class Host {
     @ManyToOne
     private Country country;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "host")
-    private List<Accommodation> accommodations;
+    //@OneToMany(fetch = FetchType.LAZY, mappedBy = "host")
+    //private List<Accommodation> accommodations;
 
     public Host(String name, String surname, Country country) {
         this.name = name;
         this.surname = surname;
         this.country = country;
-        this.accommodations = new ArrayList<>();
     }
 }

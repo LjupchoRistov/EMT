@@ -20,6 +20,5 @@ public class HostDto {
     private String name;
     private String surname;
 
-    private String countryName;
-    private Country country;
+    private Long countryId;
 }

@@ -19,8 +19,15 @@ public class Country {
     private Long id;
 
     private String name;
+    private String continent;
 
     // Relations
     //@OneToMany(fetch = FetchType.LAZY, mappedBy = "country")
     //private List<Host> hosts;
+
+
+    public Country(String name, String continent) {
+        this.name = name;
+        this.continent = continent;
+    }
 }
